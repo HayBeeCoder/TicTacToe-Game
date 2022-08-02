@@ -1,0 +1,47 @@
+{% extends "base.html"%}
+{% load static %}
+
+{%block content%}
+    <div class="container">
+      <header>
+        <h1>Tic Tac Toe</h1>
+        <div class="nav-btn">
+          <button type="button" id="versus">
+            <i class="fa-solid fa-people-arrows-left-right"></i>
+            <span> VS </span>
+          </button>
+          <button type="button" id="bot">
+            <i class="fa-solid fa-robot"></i>
+            <span> BOT </span>
+          </button>
+        </div>
+      </header>
+      <main>
+        <section class="section1">
+          <div class="btn-container">
+            <button type="button" class="tic-tac-toe-btn" id="1"></button>
+            <button type="button" class="tic-tac-toe-btn" id="2"></button>
+            <button type="button" class="tic-tac-toe-btn" id="3"></button>
+            <button type="button" class="tic-tac-toe-btn" id="4"></button>
+            <button type="button" class="tic-tac-toe-btn" id="5"></button>
+            <button type="button" class="tic-tac-toe-btn" id="6"></button>
+            <button type="button" class="tic-tac-toe-btn" id="7"></button>
+            <button type="button" class="tic-tac-toe-btn" id="8"></button>
+            <button type="button" class="tic-tac-toe-btn" id="9"></button>
+          </div>
+        </section>
+        <section class="section2">
+          <div class="player-container">
+            <div class="player one">
+              <i class="fa-solid fa-xmark"></i>
+              <p>Player 1</p>
+            </div>
+            <div class="player two">
+              <i class="fa-solid fa-o"></i>
+              <p>Player 2</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+{%endblock content%}
