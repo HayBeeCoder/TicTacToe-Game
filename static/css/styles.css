@@ -12,7 +12,7 @@ body {
 .container {
   margin: auto;
   height: 85vh;
-  width: 60%;
+  width: 900px;
 }
 header {
   display: flex;
@@ -39,6 +39,8 @@ header {
 }
 
 main {
+  width: 50%;
+  margin: auto;
 }
 .section1 {
   background: #0096ff;
@@ -46,15 +48,13 @@ main {
   border-radius: 5px;
 }
 .btn-container {
-  display: flex;
-  flex-direction: row;
-  align-content: center;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 15px;
-  justify-content: center;
   height: 55vh;
-  text-align: center;
   align-content: center;
+  place-items: center;
+  flex-shrink: 1;
 }
 .tic-tac-toe-btn {
   width: 100px;
@@ -94,6 +94,9 @@ button:hover {
 
 @media (max-width: 600px) {
   .container {
-    width: 80%;
+    width: 450px;
+  }
+  main {
+    width: 380px;
   }
 }

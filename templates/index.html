@@ -1,0 +1,91 @@
+{% extends "base.html"%}
+{% load static %}
+
+{%block content%}
+    <div class="container">
+      <header>
+        <h1>Tic Tac Toe</h1>
+        <div class="nav-btn">
+          <button type="button" id="versus">
+            <i class="fa-solid fa-people-arrows-left-right"></i>
+            <span> VS </span>
+          </button>
+          <button type="button" id="bot">
+            <i class="fa-solid fa-robot"></i>
+            <span> BOT </span>
+          </button>
+        </div>
+      </header>
+      <main>
+        <section class="section1">
+          <div class="btn-container">
+            {% for i in range%}
+            {% if i in player_1_moves.positions%}
+            <button type="button" class="tic-tac-toe-btn" id="{{i}}" value="{{player_1_moves.player_mark}}">{{player_1_moves.player_mark}}</button>
+            {% elif i in player_2_moves.positions %}
+            <button type="button" class="tic-tac-toe-btn" id="{{i}}" value="{{player_2_moves.player_mark}}">{{player_2_moves.player_mark}}</button>
+            {% else %}
+            <button type="button" class="tic-tac-toe-btn" id="{{i}}"></button>
+            {%endif%}
+
+            {%endfor%}
+
+
+          </div>
+        </section>
+        <section class="section2">
+          <div class="player-container">
+            <div class="player one">
+              <i class="fa-solid fa-xmark"></i>
+              <p>Player 1</p>
+            </div>
+            <div class="player two">
+              <i class="fa-solid fa-o"></i>
+              <p>Player 2</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+{%endblock content%}
+
+{%block script%}
+<script>
+
+base_url = `${window.location.host}${window.location.pathname}`
+console.log(base_url)
+
+
+const gameSocket = new WebSocket(`ws://${base_url}`)
+
+function add_event_to_all_buttons(){
+    /*Add event listener that send the event message to all buttons*/
+    const keys = document.querySelectorAll('.tic-tac-toe-btn');
+    keys.forEach(item => {
+      if (item.value == ""){
+        console.log(item)
+        item.addEventListener('click', send_event_message)
+    }
+  }
+)}
+
+add_event_to_all_buttons()
+
+function send_event_message(event){
+  const { target } = event
+  console.log(target.value)
+  data = {
+    "type":"played",
+    "position":target.id
+  }
+  gameSocket.send(JSON.stringify(data))
+
+}
+
+gameSocket.onmessage = function(event){
+  data = JSON.parse(event.data)
+  console.log(data)
+}
+
+</script>
+{%endblock script%}
