@@ -1,4 +1,3 @@
-from tokenize import group
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
@@ -23,7 +22,7 @@ class Game(models.Model):
     players = models.ManyToManyField(User)
     status = models.CharField(choices=STATUS, max_length=20)
     winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="winner", null=True, blank=True)
-    current_player = models.ForeignKey(User, on_delete=models.CASCADE, related_name="current_player")
+    current_player = models.ForeignKey(User, on_delete=models.CASCADE, related_name="current_player", null=True, blank=True)
 
 
     def get_invite_link(self):
@@ -31,6 +30,7 @@ class Game(models.Model):
     
     @property
     def player_1(self):
+        print(self.players.all())
         return self.players.first()
     
     @property
@@ -40,16 +40,20 @@ class Game(models.Model):
         return None
 
     def set_current_player(self):
+        print(f"current player is {self.current_player}")
         if self.current_player:
             self.current_player = self.players.exclude(id = self.current_player.id).first()
         else:
             self.current_player = self.player_1
-            self.save()
+        print(f"Current Player set to {self.current_player}")
+        self.save()
           
 
     def add_new_player(self, player):
         if self.players.all().count() < 2:
             self.players.add(player)
+            Move.objects.create(game=self, player=player, positions=[], player_mark = "O")
+
         else:
             raise Exception("A Game cannot have more than two players")
 
@@ -57,11 +61,12 @@ class Game(models.Model):
         current_move = self.moves.get(player=self.current_player).positions
         for wining_move in wining_moves:
             print(wining_move, current_move, set(wining_move) & set(current_move))
-            if set(wining_move) & set(current_move) == set(wining_move):
+            moves = set(wining_move) & set(current_move)
+            if moves == set(wining_move):
                 self.winner = self.current_player
                 self.status = "finished"
                 self.save()
-                return True
+                return True, moves
         return False
 
 
@@ -82,7 +87,7 @@ class Move(models.Model):
     ]
     uuid = models.UUIDField(default=uuid4(), editable=False)
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="moves")
-    positions = ArrayField(models.CharField(max_length=5))
+    positions = ArrayField(models.CharField(max_length=5, blank=True, null=True), blank=True, null=True)
     player = models.ForeignKey(User, on_delete=models.CASCADE)
     player_mark = models.CharField(choices=PLAYER_MARK, max_length=3, default="X")
 

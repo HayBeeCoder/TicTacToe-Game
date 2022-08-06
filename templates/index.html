@@ -35,13 +35,13 @@
         </section>
         <section class="section2">
           <div class="player-container">
-            <div class="player one">
+            <div id="{{player_1}}" class="player one">
               <i class="fa-solid fa-xmark"></i>
-              <p>Player 1</p>
+              <p >{{player_1}}</p>
             </div>
-            <div class="player two">
+            <div id="{{player_2}}" class="player two">
               <i class="fa-solid fa-o"></i>
-              <p>Player 2</p>
+              <p >{{player_2}}</p>
             </div>
           </div>
         </section>
@@ -63,7 +63,6 @@ function add_event_to_all_buttons(){
     const keys = document.querySelectorAll('.tic-tac-toe-btn');
     keys.forEach(item => {
       if (item.value == ""){
-        console.log(item)
         item.addEventListener('click', send_event_message)
     }
   }
@@ -76,7 +75,9 @@ function send_event_message(event){
   console.log(target.value)
   data = {
     "type":"played",
-    "position":target.id
+    "position":target.id,
+    "player":`{{request.user}}`
+    
   }
   gameSocket.send(JSON.stringify(data))
 
@@ -84,7 +85,67 @@ function send_event_message(event){
 
 gameSocket.onmessage = function(event){
   data = JSON.parse(event.data)
-  console.log(data)
+  type = data["type"]
+
+  if (type == "update_board_message"){
+    update_board_handler(data)
+  }
+  
+  else if (type == "winner_message"){
+    winner_handler(data)
+  }
+  else if (type = "initialize_current_player"){
+    initialize_current_player(data)
+  }
+
+
+
+}
+
+function update_board_handler(data){
+  position=data["position"]
+  player_mark=data["player_mark"]
+  const button = document.getElementById(position)
+  button.value = player_mark
+  button.innerText = player_mark
+  button.removeEventListener("click", send_event_message)
+  next_player = data["next_player"]
+  current_player = data["current_player"]
+  document.getElementById(next_player).style.background = "green"
+  document.getElementById(current_player).style.background = "red"
+
+
+
+
+}
+
+function winner_handler(data){
+  let winning_moves = data["winning_moves"]
+  winning_moves.forEach(id=>{
+      let button = document.getElementById(id)
+      button.style.backgroundColor = "green"
+      remove_event_from_all_buttons()
+      alert(`${data["winner"]} WON !`)
+
+  })
+}
+
+function remove_event_from_all_buttons(){
+    /*Add event listener that send the event message to all buttons*/
+    const keys = document.querySelectorAll('.tic-tac-toe-btn');
+    keys.forEach(button => {
+      if (button.value == ""){
+      button.removeEventListener("click", send_event_message)
+    }
+  }
+)}
+
+function initialize_current_player(data){
+  current_player = data["current_player"]
+  other_player = data["other_player"]
+  document.getElementById(current_player).style.background = "green"
+  document.getElementById(other_player).style.background = "red"
+
 }
 
 </script>

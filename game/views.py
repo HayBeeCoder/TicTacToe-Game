@@ -12,7 +12,6 @@ def game_view(request, uuid):
     player_1 = game.player_1
     player_2 = game.player_2
     players = game.players.all()
-    print(player_1,player_2,moves)
     context={
         "game":game,
         "moves":moves,
@@ -20,7 +19,7 @@ def game_view(request, uuid):
         "player_2":player_2,
         "range": [str(i) for i in range(1,10)],
         "player_1_moves":moves.get(player=player_1),
-        "player_2_moves":moves.get(player=player_2)
+        "player_2_moves":moves.get(player=player_2) if len(moves) > 1 else ""
         
     }
     return render(request, "index.html", context=context)
