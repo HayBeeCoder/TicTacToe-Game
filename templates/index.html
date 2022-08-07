@@ -1,152 +1,53 @@
-{% extends "base.html"%}
 {% load static %}
-
-{%block content%}
-    <div class="container">
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    />
+  </head>
+  <body>
+    <main>
       <header>
         <h1>Tic Tac Toe</h1>
-        <div class="nav-btn">
-          <button type="button" id="versus">
-            <i class="fa-solid fa-people-arrows-left-right"></i>
-            <span> VS </span>
-          </button>
-          <button type="button" id="bot">
-            <i class="fa-solid fa-robot"></i>
-            <span> BOT </span>
-          </button>
-        </div>
+       
       </header>
-      <main>
-        <section class="section1">
-          <div class="btn-container">
-            {% for i in range%}
-            {% if i in player_1_moves.positions%}
-            <button type="button" class="tic-tac-toe-btn" id="{{i}}" value="{{player_1_moves.player_mark}}">{{player_1_moves.player_mark}}</button>
-            {% elif i in player_2_moves.positions %}
-            <button type="button" class="tic-tac-toe-btn" id="{{i}}" value="{{player_2_moves.player_mark}}">{{player_2_moves.player_mark}}</button>
-            {% else %}
-            <button type="button" class="tic-tac-toe-btn" id="{{i}}"></button>
-            {%endif%}
+      <div class="btn-container">
+        <button id="createNewGame">Create a new game</button>
 
-            {%endfor%}
-
-
-          </div>
-        </section>
-        <section class="section2">
-          <div class="player-container">
-            <div id="{{player_1}}" class="player one">
-              <i class="fa-solid fa-xmark"></i>
-              <p >{{player_1}}</p>
+        <form method="post" action="/">
+          <div class="nav-btn">
+            <button name="new-game-vs" id="versus" value="new-game-vs">
+                <i class="fa-solid fa-people-arrows-left-right"></i>
+                <span> VS </span>
+              </button>
+              <button id="bot"  name="new-game-bot" value="new-game-bot">
+                <i class="fa-solid fa-robot"></i>
+                <span> BOT </span>
+              </button>
+            
             </div>
-            <div id="{{player_2}}" class="player two">
-              <i class="fa-solid fa-o"></i>
-              <p >{{player_2}}</p>
-            </div>
+      
+          <div class="OR">
+          <i class="fa-solid fa-o"></i>
+          <i class="fa-solid fa-r"></i>
+        </div>
+        <div class="input-section">
+          <h3>Join game via invite link...</h3>
+          <div class="input-text">
+            <label for="code">Input Code:</label>
+            <input type="text" name="invite-link">
           </div>
-        </section>
-      </main>
-    </div>
-{%endblock content%}
-
-{%block script%}
-<script>
-
-base_url = `${window.location.host}${window.location.pathname}`
-console.log(base_url)
-
-
-const gameSocket = new WebSocket(`ws://${base_url}`)
-
-function add_event_to_all_buttons(){
-    /*Add event listener that send the event message to all buttons*/
-    const keys = document.querySelectorAll('.tic-tac-toe-btn');
-    keys.forEach(item => {
-      if (item.value == ""){
-        item.addEventListener('click', send_event_message)
-    }
-  }
-)}
-
-add_event_to_all_buttons()
-
-function send_event_message(event){
-  const { target } = event
-  console.log(target.value)
-  data = {
-    "type":"played",
-    "position":target.id,
-    "player":`{{request.user}}`
-    
-  }
-  gameSocket.send(JSON.stringify(data))
-
-}
-
-gameSocket.onmessage = function(event){
-  data = JSON.parse(event.data)
-  type = data["type"]
-
-  if (type == "update_board_message"){
-    update_board_handler(data)
-  }
-  
-  else if (type == "winner_message"){
-    winner_handler(data)
-  }
-  else if (type = "initialize_current_player"){
-    initialize_current_player(data)
-  }
-
-
-
-}
-
-function update_board_handler(data){
-  position=data["position"]
-  player_mark=data["player_mark"]
-  const button = document.getElementById(position)
-  button.value = player_mark
-  button.innerText = player_mark
-  button.removeEventListener("click", send_event_message)
-  next_player = data["next_player"]
-  current_player = data["current_player"]
-  document.getElementById(next_player).style.background = "green"
-  document.getElementById(current_player).style.background = "red"
-
-
-
-
-}
-
-function winner_handler(data){
-  let winning_moves = data["winning_moves"]
-  winning_moves.forEach(id=>{
-      let button = document.getElementById(id)
-      button.style.backgroundColor = "green"
-      remove_event_from_all_buttons()
-      alert(`${data["winner"]} WON !`)
-
-  })
-}
-
-function remove_event_from_all_buttons(){
-    /*Add event listener that send the event message to all buttons*/
-    const keys = document.querySelectorAll('.tic-tac-toe-btn');
-    keys.forEach(button => {
-      if (button.value == ""){
-      button.removeEventListener("click", send_event_message)
-    }
-  }
-)}
-
-function initialize_current_player(data){
-  current_player = data["current_player"]
-  other_player = data["other_player"]
-  document.getElementById(current_player).style.background = "green"
-  document.getElementById(other_player).style.background = "red"
-
-}
-
-</script>
-{%endblock script%}
+          <button id="submit">Submit</button>
+        </form>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

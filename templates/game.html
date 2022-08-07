@@ -1,0 +1,192 @@
+{% extends "base.html"%}
+{% load static %}
+
+{%block content%}
+    <div class="container">
+      {% for message in messages%}
+      {{message}}
+      {%endfor%}
+      <header>
+        <h1>Tic Tac Toe</h1>
+        <div class="nav-btn">
+          <p>Invite Link: {{game.game_uuid}}</p>
+          <!--<button type="button" id="versus">
+            <i class="fa-solid fa-people-arrows-left-right"></i>
+            <span> VS </span>
+          </button>
+          <button type="button" id="bot">
+            <i class="fa-solid fa-robot"></i>
+            <span> BOT </span>
+          </button> -->
+        </div>
+      </header>
+      <main>
+        <section class="section1">
+          <div class="btn-container">
+            {% for i in range%}
+            {% if i in player_1_moves.positions%}
+            <button type="button" class="tic-tac-toe-btn" id="{{i}}" value="{{player_1_moves.player_mark}}">{{player_1_moves.player_mark}}</button>
+            {% elif i in player_2_moves.positions %}
+            <button type="button" class="tic-tac-toe-btn" id="{{i}}" value="{{player_2_moves.player_mark}}">{{player_2_moves.player_mark}}</button>
+            {% else %}
+            <button type="button" class="tic-tac-toe-btn" id="{{i}}"></button>
+            {%endif%}
+
+            {%endfor%}
+
+
+          </div>
+        </section>
+        <section class="section2">
+          <div class="player-container">
+            <div id="{{player_1}}" class="player one">
+              <i class="fa-solid fa-xmark"></i>
+              <p >{{player_1}}</p>
+            </div>
+            <div id="{{player_2}}" class="player two">
+              <i class="fa-solid fa-o"></i>
+              <p >{{player_2}}</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+{%endblock content%}
+
+{%block script%}
+<script>
+
+{% if game.versus_type == "BOT"%}
+base_url = `${window.location.host}/bot${window.location.pathname}`
+console.log(base_url)
+{% else %}
+base_url = `${window.location.host}${window.location.pathname}`
+console.log(base_url)
+
+
+{%endif%}
+
+
+
+const gameSocket = new WebSocket(`ws://${base_url}`)
+
+function add_event_to_all_buttons(){
+    /*Add event listener that send the event message to all buttons*/
+    const keys = document.querySelectorAll('.tic-tac-toe-btn');
+    keys.forEach(item => {
+      if (item.value == ""){
+        item.addEventListener('click', send_event_message)
+    }
+  }
+)}
+
+add_event_to_all_buttons()
+
+function send_event_message(event){
+  const { target } = event
+  console.log(target.value)
+  data = {
+    "type":"played",
+    "position":target.id,
+    "player":`{{request.user}}`
+    
+  }
+  gameSocket.send(JSON.stringify(data))
+
+}
+
+gameSocket.onmessage = function(event){
+  data = JSON.parse(event.data)
+  type = data["type"]
+
+  if (type == "update_board_message"){
+    update_board_handler(data)
+  }
+
+  else if(type == "bot_update_board_message"){
+    bot_update_board_handler(data)
+  }
+  
+  else if (type == "winner_message"){
+    winner_handler(data)
+  }
+  else if (type = "initialize_current_player"){
+    initialize_current_player(data)
+  }
+
+
+
+}
+
+function update_board_handler(data){
+  position=data["position"]
+  player_mark=data["player_mark"]
+  const button = document.getElementById(position)
+  button.value = player_mark
+  button.innerText = player_mark
+  button.removeEventListener("click", send_event_message)
+  next_player = data["next_player"]
+  current_player = data["current_player"]
+  document.getElementById(next_player).style.background = "green"
+  document.getElementById(current_player).style.background = "red"
+
+
+
+
+}
+
+function winner_handler(data){
+  let winning_moves = data["winning_moves"]
+  winning_moves.forEach(id=>{
+      let button = document.getElementById(id)
+      button.style.backgroundColor = "green"
+      remove_event_from_all_buttons()
+  })
+  let nav_button = document.getElementsByClassName("nav-btn")
+  play_again_button = document.createElement("button")
+  play_again_button.value = "play again"
+  play_again_button.innerText = "Play Again"
+  nav_button.appendChild(play_again_button)
+  alert(`${data["winner"]} WON !`)
+
+}
+
+function remove_event_from_all_buttons(){
+    /*Add event listener that send the event message to all buttons*/
+    const keys = document.querySelectorAll('.tic-tac-toe-btn');
+    keys.forEach(button => {
+      if (button.value == ""){
+      button.removeEventListener("click", send_event_message)
+    }
+  }
+)}
+
+function initialize_current_player(data){
+  current_player = data["current_player"]
+  other_player = data["other_player"]
+  document.location.reload()
+
+  document.getElementById(current_player).style.background = "green"
+  document.getElementById(other_player).style.background = "red"
+
+}
+
+function bot_update_board_handler(data){
+  player_position=data["player_position"]
+  player_mark=data["player_mark"]
+  let button = document.getElementById(player_position)
+  button.value = player_mark
+  button.innerText = player_mark
+  button.removeEventListener("click", send_event_message)
+  
+  bot_position=data["bot_position"]
+  bot_mark=data["bot_mark"]
+  button = document.getElementById(bot_position)
+  button.value = bot_mark
+  button.innerText = bot_mark
+  button.removeEventListener("click", send_event_message)
+}
+
+
+</script>
+{%endblock script%}

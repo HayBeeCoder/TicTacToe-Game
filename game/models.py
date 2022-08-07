@@ -1,3 +1,5 @@
+from statistics import mode
+from django.urls import reverse
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
@@ -10,33 +12,42 @@ User = get_user_model()
 
 wining_moves = [["1", "4", "7"],["2","5","8"],["3","6","9"],
 ["1", "2", "3"],["4","5","6"],["7","8","9"],
-["1", "5", "9"],["3","5","9"]]
+["1", "5", "9"],["3","5","7"]]
 
 class Game(models.Model):
+
+    IN_PROGRESS, FINISHED = range(2)
+    VERSUS, BOT = range(2)
+
     
     STATUS = [
-        ("in_progess", "in_progress"),
-        ("finished", "finished")
+        (IN_PROGRESS, "In_Progress"),
+        (FINISHED, "Finished")
     ]
+    TYPE = [
+        (VERSUS, "Versus"),
+        (BOT, "Bot")
+    ]
+    versus_type = models.CharField(max_length=10, choices=TYPE, default="Versus")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_by", default=1)
     game_uuid = models.UUIDField(default=uuid4(), editable=False)
     players = models.ManyToManyField(User)
-    status = models.CharField(choices=STATUS, max_length=20)
+    status = models.CharField(choices=STATUS, max_length=20, default="In_Progress")
     winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="winner", null=True, blank=True)
     current_player = models.ForeignKey(User, on_delete=models.CASCADE, related_name="current_player", null=True, blank=True)
 
 
-    def get_invite_link(self):
-        pass
+    def get_absolute_url(self):
+        return reverse("game_view", kwargs = {"uuid":self.game_uuid})
     
     @property
     def player_1(self):
-        print(self.players.all())
-        return self.players.first()
+        return self.created_by
     
     @property
     def player_2(self):
         if self.players.all().count() == 2:
-            return self.players.last()
+            return self.players.exclude(id = self.created_by.id).first()
         return None
 
     def set_current_player(self):
@@ -49,10 +60,10 @@ class Game(models.Model):
         self.save()
           
 
-    def add_new_player(self, player):
+    def add_new_player(self, player, mark="O"):
         if self.players.all().count() < 2:
             self.players.add(player)
-            Move.objects.create(game=self, player=player, positions=[], player_mark = "O")
+            Move.objects.create(game=self, player=player, positions=[], player_mark = mark)
 
         else:
             raise Exception("A Game cannot have more than two players")
@@ -63,8 +74,9 @@ class Game(models.Model):
             print(wining_move, current_move, set(wining_move) & set(current_move))
             moves = set(wining_move) & set(current_move)
             if moves == set(wining_move):
+                print("WON")
                 self.winner = self.current_player
-                self.status = "finished"
+                self.status = "Finished"
                 self.save()
                 return True, moves
         return False
