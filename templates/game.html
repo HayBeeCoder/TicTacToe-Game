@@ -88,7 +88,7 @@ function send_event_message(event){
   data = {
     "type":"played",
     "position":target.id,
-    "player":`{{request.user}}`
+    "player":`{{request.session.user}}`
     
   }
   gameSocket.send(JSON.stringify(data))
@@ -162,9 +162,15 @@ function remove_event_from_all_buttons(){
 )}
 
 function initialize_current_player(data){
+  //document.location.reload()
+
   current_player = data["current_player"]
   other_player = data["other_player"]
-  document.location.reload()
+  div_class= document.getElementById("None")
+  div_class.setAttribute("id", other_player)
+  player_tag = div_class.getElementByTagName("p")
+  player_tag.innerText(other_player)
+  
 
   document.getElementById(current_player).style.background = "green"
   document.getElementById(other_player).style.background = "red"

@@ -1,4 +1,6 @@
 from django.contrib import admin
+
+
 from .models import Game, Move
 from typing import Any
 #Register your models here.

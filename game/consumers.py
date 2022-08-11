@@ -3,6 +3,7 @@ from typing import Tuple
 from channels.generic.websocket import WebsocketConsumer
 from channels.layers import channel_layers
 from channels.db import database_sync_to_async
+from django.contrib.sessions.models import Session
 
 from game.bot import BotPlay
 from .models import Game, Move, User
@@ -10,9 +11,11 @@ from asgiref.sync import sync_to_async ,async_to_sync
 
 class TicTacToeConsumer(WebsocketConsumer):
     def connect(self):
+        self.user = Session.objects.get(session_key = self.scope["session"].session_key)
+
         self.game_uuid = str(self.scope["url_route"]["kwargs"]["uuid"])
         self.game = Game.objects.get(game_uuid = self.game_uuid)
-        self.user = self.scope["user"]
+        #self.user = self.scope["user"]
         async_to_sync(self.channel_layer.group_add)(self.game_uuid, self.channel_name)
         self.players =  self.game.players.all()
         self.accept()
@@ -23,8 +26,8 @@ class TicTacToeConsumer(WebsocketConsumer):
 
             async_to_sync(self.channel_layer.group_send)(self.game_uuid, {
                    "type":"initialize_current_player",
-                   "current_player":str(self.game.current_player),
-                   "other_player":str(self.game.player_2)}
+                   "current_player":str(self.game.current_player.get_decoded()["user"]),
+                   "other_player":str(self.game.player_2.get_decoded()["user"])}
             )
         
 
@@ -32,27 +35,25 @@ class TicTacToeConsumer(WebsocketConsumer):
 
     def receive(self, text_data=None, bytes_data=None):
         text_data = json.loads(text_data)
-
+        print(self.scope["session"]["user"])
         if self.game.status == "Finished":
             return
         
+        current_player = str(self.game.current_player.get_decoded()["user"])
 
-        if str(self.game.current_player) != text_data["player"]:
-            print(self.game.current_player , text_data["player"])
+        if current_player != text_data["player"]:
             return
         position = text_data["position"]
-        print(text_data)
         move = self.game.moves.get(player = self.user)
         move.positions.append(position)
         
         move.save()
         player_mark = move.player_mark
         
-
         async_to_sync(self.channel_layer.group_send)(self.game_uuid, {
             "type":"update_board",
             "position":position,
-            "current_player":text_data["player"],
+            "current_player":current_player,#text_data["player"],
             "player_mark":player_mark
             
         })
@@ -62,7 +63,7 @@ class TicTacToeConsumer(WebsocketConsumer):
             move = self.game.moves.get(player = self.user)
             data = {
                 "type":"winner_message",
-                "user":str(self.user),
+                "user":str(self.user.get_decoded()["user"]),
                 "position":position,
                 "winning_moves":list(is_winner[1])
             }
@@ -83,9 +84,8 @@ class TicTacToeConsumer(WebsocketConsumer):
 
     def update_board(self, event):
         self.game.set_current_player()
-        next_player =self.game.current_player
-        print( {"current_player":event.get("current_player"),
-                "next_player":str(next_player),})
+        next_player =self.game.current_player.get_decoded()["user"]
+
         self.send(json.dumps(
             {
                 "type":"update_board_message",
@@ -110,7 +110,9 @@ class TicTacToeConsumer(WebsocketConsumer):
 class TicTacToeBOTConsumer(WebsocketConsumer):
 
     def connect(self):
-        self.user = self.scope["user"]
+        self.user = self.scope["session"]["user"]
+
+        #self.user = self.scope["user"]
         self.game_uuid = str(self.scope["url_route"]["kwargs"]["uuid"])
         self.game = Game.objects.get(game_uuid = self.game_uuid)
         self.game.set_current_player()
@@ -157,7 +159,6 @@ class TicTacToeBOTConsumer(WebsocketConsumer):
         bot_move =botPlayer.check_player_win_move(botPlayer.bot_moves,
                                                   botPlayer.player_moves  )
         if isinstance(bot_move, str):
-            print("We are here")
             bot_player_move.positions.append(bot_move)
             bot_player_move.save()
 
