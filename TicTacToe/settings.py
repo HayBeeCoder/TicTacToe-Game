@@ -78,6 +78,7 @@ ASGI_APPLICATION = "TicTacToe.asgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+'''
 DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -88,7 +89,7 @@ DATABASES = {
             'PORT': config('DATABASE_PORT'),
         }
     }
-
+'''
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
