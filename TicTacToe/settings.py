@@ -154,6 +154,7 @@ CHANNEL_LAYERS = {
     },
 }
 
+BOT_KEY = config("BOT_KEY")
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage" 
 

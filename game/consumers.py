@@ -4,7 +4,7 @@ from channels.generic.websocket import WebsocketConsumer
 from channels.layers import channel_layers
 from channels.db import database_sync_to_async
 from django.contrib.sessions.models import Session
-
+from django.conf import settings
 from game.bot import BotPlay
 from .models import Game, Move, User
 from asgiref.sync import sync_to_async ,async_to_sync
@@ -137,7 +137,7 @@ class TicTacToeBOTConsumer(WebsocketConsumer):
         self.game_uuid = str(self.scope["url_route"]["kwargs"]["uuid"])
         self.game = Game.objects.get(game_uuid = self.game_uuid)
         self.game.set_current_player()
-        self.bot_player = Session.objects.get(session_key="zsyri6xkxq2le9kfoasoh3ao2kqke1ha")
+        self.bot_player = Session.objects.get(session_key=settings.BOT_KEY)
     
         self.accept()
 

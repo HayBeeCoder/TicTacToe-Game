@@ -4,7 +4,7 @@ import re
 from uuid import uuid4
 from django.shortcuts import render, get_object_or_404, redirect
 
-
+from django.conf import settings
 from .models import Game, Move
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest
@@ -60,7 +60,7 @@ def index(request:HttpRequest):
             messages.add_message(request, level=INFO, message=f"Invite Link: {str(new_game.game_uuid)}")
             return redirect(new_game)
         elif request.POST.get("new-game-bot"):
-            BOT = Session.objects.get(session_key="zsyri6xkxq2le9kfoasoh3ao2kqke1ha")
+            BOT = Session.objects.get(session_key=settings.BOT_KEY)
             request.session["user"] = f"player_{random.randint(0,100)}"
             session_obj = Session.objects.get(session_key=request.session.session_key)
             new_game = Game.objects.create(game_uuid =uuid4() ,
