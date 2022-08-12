@@ -1,0 +1,106 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+body {
+  min-height: 100vh;
+  display: flex;
+  background: #5800ff;
+}
+.container {
+  margin: auto;
+  height: 85vh;
+  width: 900px;
+}
+header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  height: 15vh;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.nav-btn {
+  display: flex;
+  flex-direction: row;
+  gap: 100px;
+}
+.nav-btn button {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100px;
+  height: 40px;
+  border-radius: 5px;
+  border-color: white;
+}
+
+main {
+  width: 450px;
+  margin: auto;
+}
+.section1 {
+  background: #0096ff;
+  height: 60vh;
+  border-radius: 5px;
+}
+.btn-container {
+  padding-top: 30px;
+  padding-left: 20px;
+  padding-right: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  height: 55vh;
+  align-content: center;
+  place-items: center;
+  flex-shrink: 1;
+}
+.tic-tac-toe-btn {
+  width: 100px;
+  height: 100px;
+  border-radius: 5px;
+  border-color: white;
+}
+.section2 {
+  margin-top: 15px;
+  height: 13vh;
+}
+.player-container {
+  display: flex;
+  flex-direction: row;
+}
+.player {
+  height: 13vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px;
+  align-items: center;
+  width: 50%;
+  background: #0096ff;
+  border-radius: 5px;
+}
+.one {
+  margin-right: 2px;
+}
+.two {
+  margin-left: 2px;
+}
+button:hover {
+  background: #72ffff;
+  border: none;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: 450px;
+  }
+  main {
+    width: 380px;
+  }
+}
