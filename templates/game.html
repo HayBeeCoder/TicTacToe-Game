@@ -8,6 +8,7 @@
       {%endfor%}
       <header>
         <h1>Tic Tac Toe</h1>
+        <div class="play-again"></div>
         <div class="nav-btn">
           <p>Invite Link: {{game.game_uuid}}</p>
           <!--<button type="button" id="versus">
@@ -25,9 +26,9 @@
           <div class="btn-container">
             {% for i in range%}
             {% if i in player_1_moves.positions%}
-            <button type="button" class="tic-tac-toe-btn" id="{{i}}" value="{{player_1_moves.player_mark}}">{{player_1_moves.player_mark}}</button>
+            <button type="button" class="tic-tac-toe-btn" id="{{i}}" value="{{player_1_moves.player_mark}}"><h2>{{player_1_moves.player_mark}}</h2></button>
             {% elif i in player_2_moves.positions %}
-            <button type="button" class="tic-tac-toe-btn" id="{{i}}" value="{{player_2_moves.player_mark}}">{{player_2_moves.player_mark}}</button>
+            <button type="button" class="tic-tac-toe-btn" id="{{i}}" value="{{player_2_moves.player_mark}}"><h2>{{player_2_moves.player_mark}}</h2></button>
             {% else %}
             <button type="button" class="tic-tac-toe-btn" id="{{i}}"></button>
             {%endif%}
@@ -98,21 +99,31 @@ function send_event_message(event){
 gameSocket.onmessage = function(event){
   data = JSON.parse(event.data)
   type = data["type"]
+  console.log(type)
 
   if (type == "update_board_message"){
     update_board_handler(data)
   }
 
   else if(type == "bot_update_board_message"){
-    bot_update_board_handler(data)
+    
+      bot_update_board_handler(data)
+    
   }
   
   else if (type == "winner_message"){
     winner_handler(data)
   }
-  else if (type = "initialize_current_player"){
+  else if (type == "initialize_current_player"){
+    console.log(data)
     initialize_current_player(data)
   }
+
+  else if (type == "reload_page"){
+    window.location.reload()
+  }
+
+  
 
 
 
@@ -123,12 +134,17 @@ function update_board_handler(data){
   player_mark=data["player_mark"]
   const button = document.getElementById(position)
   button.value = player_mark
-  button.innerText = player_mark
+  button.innerHTML = `<h2>${player_mark}</h2>`
   button.removeEventListener("click", send_event_message)
   next_player = data["next_player"]
   current_player = data["current_player"]
   document.getElementById(next_player).style.background = "green"
   document.getElementById(current_player).style.background = "red"
+
+  if (data["count"] >= 10){
+    play_again_handler()
+
+  }
 
 
 
@@ -142,13 +158,7 @@ function winner_handler(data){
       button.style.backgroundColor = "green"
       remove_event_from_all_buttons()
   })
-  let nav_button = document.getElementsByClassName("nav-btn")
-  play_again_button = document.createElement("button")
-  play_again_button.value = "play again"
-  play_again_button.innerText = "Play Again"
-  nav_button.appendChild(play_again_button)
-  alert(`${data["winner"]} WON !`)
-
+  play_again_handler()
 }
 
 function remove_event_from_all_buttons(){
@@ -162,7 +172,7 @@ function remove_event_from_all_buttons(){
 )}
 
 function initialize_current_player(data){
-  //document.location.reload()
+  document.location.reload()
 
   current_player = data["current_player"]
   other_player = data["other_player"]
@@ -170,6 +180,7 @@ function initialize_current_player(data){
   div_class.setAttribute("id", other_player)
   player_tag = div_class.getElementByTagName("p")
   player_tag.innerText(other_player)
+  window.location.reload()
   
 
   document.getElementById(current_player).style.background = "green"
@@ -178,19 +189,47 @@ function initialize_current_player(data){
 }
 
 function bot_update_board_handler(data){
+  console.log(data)
   player_position=data["player_position"]
   player_mark=data["player_mark"]
   let button = document.getElementById(player_position)
   button.value = player_mark
-  button.innerText = player_mark
+  button.innerHTML = `<h2>${player_mark}</h2>`
   button.removeEventListener("click", send_event_message)
   
-  bot_position=data["bot_position"]
-  bot_mark=data["bot_mark"]
-  button = document.getElementById(bot_position)
-  button.value = bot_mark
-  button.innerText = bot_mark
-  button.removeEventListener("click", send_event_message)
+  if (data["bot_position"] != null){
+    bot_position=data["bot_position"]
+    bot_mark=data["bot_mark"]
+    button = document.getElementById(bot_position)
+    button.value = bot_mark
+    button.innerHTML = `<h2>${bot_mark}</h2>`
+    button.removeEventListener("click", send_event_message)
+    }
+  if (data["count"] >= 10){
+    play_again_handler()
+
+  }
+}
+
+function play_again_handler(){
+  let nav_button = document.getElementsByClassName("play-again")
+  play_again_button = document.createElement("button")
+  play_again_button.value = "play again"
+  play_again_button.name = "play_again"
+  play_again_button.type = "submit"
+  play_again_button.innerHTML = "<h4>Play Again</h4>"
+  play_again_button.onclick = function(){
+    gameSocket.send(
+      JSON.stringify({
+        "type":"play_again"
+      })
+    )
+  }
+  console.log(play_again_button)
+  document.body.appendChild(play_again_button)
+  console.log(nav_button)
+
+  
 }
 
 

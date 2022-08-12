@@ -60,13 +60,14 @@ def index(request:HttpRequest):
             messages.add_message(request, level=INFO, message=f"Invite Link: {str(new_game.game_uuid)}")
             return redirect(new_game)
         elif request.POST.get("new-game-bot"):
-            BOT = User.objects.get(username = "BOT")
-
+            BOT = Session.objects.get(session_key="zsyri6xkxq2le9kfoasoh3ao2kqke1ha")
+            request.session["user"] = f"player_{random.randint(0,100)}"
+            session_obj = Session.objects.get(session_key=request.session.session_key)
             new_game = Game.objects.create(game_uuid =uuid4() ,
                                         status = "In_Progress",
                                          created_by=session_obj,
                                          versus_type="BOT")
-            new_game.add_new_player(player=request.user, mark="X")
+            new_game.add_new_player(player=session_obj, mark="X")
             new_game.add_new_player(player=BOT, mark="O")
 
             

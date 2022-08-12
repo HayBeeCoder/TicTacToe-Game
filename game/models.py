@@ -37,10 +37,21 @@ class Game(models.Model):
     winner = models.ForeignKey(Session, on_delete=models.SET_NULL, related_name="winner", null=True, blank=True)
     current_player = models.ForeignKey(Session
     , on_delete=models.SET_NULL, related_name="current_player", null=True, blank=True)
+    move_count = models.IntegerField(default=0)
 
 
     def get_absolute_url(self):
         return reverse("game_view", kwargs = {"uuid":self.game_uuid})
+
+    def clear_game_data(self):
+        self.status = "In_Progress"
+        self.winner = None
+        self.move_count = 0
+        for move in self.moves.all():
+            move.positions = []
+            move.save()
+        self.save()
+
     
     @property
     def player_1(self):
@@ -79,7 +90,17 @@ class Game(models.Model):
                 return True, moves
         return False
 
+    def check_draw(self):
+        if self.move_count >= 9:
+            self.status = "Finished"
+            return True
+        else:
 
+            self.move_count += 2
+   
+        return False
+    
+ 
  #   def save(self, *args, **kwargs) -> None:
  #       check  = self.players.all().count() > 2
  #       if check:

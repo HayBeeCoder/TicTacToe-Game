@@ -3,6 +3,7 @@ from django.contrib import admin
 
 from .models import Game, Move
 from typing import Any
+from django.contrib.sessions.models import Session
 #Register your models here.
 
 @admin.register(Game)
@@ -13,5 +14,5 @@ class GameAdmin(admin.ModelAdmin):
         Move.objects.create(game=form.instance, player=form.instance.player_1, positions=[])
 
 
-
+admin.site.register(Session)
 admin.site.register(Move)

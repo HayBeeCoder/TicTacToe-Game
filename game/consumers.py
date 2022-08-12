@@ -35,6 +35,16 @@ class TicTacToeConsumer(WebsocketConsumer):
 
     def receive(self, text_data=None, bytes_data=None):
         text_data = json.loads(text_data)
+        if text_data["type"] == "play_again":
+            self.game.clear_game_data()
+
+            async_to_sync(self.channel_layer.group_send)(self.game_uuid, 
+                {
+                    "type":"reload_page"
+                }
+            )
+          
+            return
         print(self.scope["session"]["user"])
         if self.game.status == "Finished":
             return
@@ -49,16 +59,20 @@ class TicTacToeConsumer(WebsocketConsumer):
         
         move.save()
         player_mark = move.player_mark
-        
+
+        self.game.check_draw()
         async_to_sync(self.channel_layer.group_send)(self.game_uuid, {
             "type":"update_board",
             "position":position,
             "current_player":current_player,#text_data["player"],
             "player_mark":player_mark
             
+            
         })
 
         is_winner = self.game.check_winner()
+        print(self.game.move_count)
+
         if isinstance(is_winner, Tuple):
             move = self.game.moves.get(player = self.user)
             data = {
@@ -92,7 +106,8 @@ class TicTacToeConsumer(WebsocketConsumer):
                 "current_player":event.get("current_player"),
                 "position":event.get("position"),
                 "next_player":str(next_player),
-                "player_mark":event.get("player_mark")
+                "player_mark":event.get("player_mark"),
+                "count":self.game.move_count
             }
         ))
 
@@ -100,6 +115,12 @@ class TicTacToeConsumer(WebsocketConsumer):
         self.send(
             json.dumps(event)
         )
+
+    def reload_page(self, event):
+        self.send(
+            json.dumps(event)
+        )
+
 
 
 
@@ -110,19 +131,29 @@ class TicTacToeConsumer(WebsocketConsumer):
 class TicTacToeBOTConsumer(WebsocketConsumer):
 
     def connect(self):
-        self.user = self.scope["session"]["user"]
+        self.user = Session.objects.get(session_key = self.scope["session"].session_key)
 
         #self.user = self.scope["user"]
         self.game_uuid = str(self.scope["url_route"]["kwargs"]["uuid"])
         self.game = Game.objects.get(game_uuid = self.game_uuid)
         self.game.set_current_player()
-        self.bot_player = User.objects.get(username="BOT")
+        self.bot_player = Session.objects.get(session_key="zsyri6xkxq2le9kfoasoh3ao2kqke1ha")
     
         self.accept()
 
 
     def receive(self, text_data=None, bytes_data=None):
+        print(text_data)
         text_data = json.loads(text_data)
+
+        if text_data["type"] == "play_again":
+            self.game.clear_game_data()
+            self.send(
+                json.dumps({
+                    "type":"reload_page"
+                })
+            )
+            return
         if self.game.status == "Finished":
             return
 
@@ -178,14 +209,16 @@ class TicTacToeBOTConsumer(WebsocketConsumer):
 
         bot_mark = bot_player_move.player_mark
           
-
+        self.game.check_draw()
+        
         self.send(json.dumps(
             {
                 "type":"bot_update_board_message",
                 "player_position":player_position,
                 "bot_position":bot_move,
                 "player_mark":player_mark,
-                "bot_mark":bot_mark
+                "bot_mark":bot_mark,
+                "count":self.game.move_count
              }
             ))
         
@@ -202,6 +235,16 @@ class TicTacToeBOTConsumer(WebsocketConsumer):
             }
             ))
             return
+        
+        if not is_winner and self.game.move_count >= 9:
+            self.send(json.dumps(
+
+                {
+                "type":"draw_message",
+            }
+            ))
+            return
+
         self.game.set_current_player()
         
         
