@@ -1,237 +1,300 @@
-{% extends "base.html"%}
-{% load static %}
-
-{%block content%}
-    <div class="container">
-      {% for message in messages%}
-      {{message}}
-      {%endfor%}
-      <header>
-        <h1>Tic Tac Toe</h1>
-        <div class="play-again"></div>
-        <div class="nav-btn">
-          <p>Invite Link: {{game.game_uuid}}</p>
-          <!--<button type="button" id="versus">
-            <i class="fa-solid fa-people-arrows-left-right"></i>
-            <span> VS </span>
-          </button>
-          <button type="button" id="bot">
-            <i class="fa-solid fa-robot"></i>
-            <span> BOT </span>
-          </button> -->
-        </div>
-      </header>
-      <main>
-        <section class="section1">
-          <div class="btn-container">
-            {% for i in range%}
-            {% if i in player_1_moves.positions%}
-            <button type="button" class="tic-tac-toe-btn" id="{{i}}" value="{{player_1_moves.player_mark}}"><h2>{{player_1_moves.player_mark}}</h2></button>
-            {% elif i in player_2_moves.positions %}
-            <button type="button" class="tic-tac-toe-btn" id="{{i}}" value="{{player_2_moves.player_mark}}"><h2>{{player_2_moves.player_mark}}</h2></button>
-            {% else %}
-            <button type="button" class="tic-tac-toe-btn" id="{{i}}"></button>
-            {%endif%}
-
-            {%endfor%}
-
-
-          </div>
-        </section>
-        <section class="section2">
-          <div class="player-container">
-            <div id="{{player_1}}" class="player one">
-              <i class="fa-solid fa-xmark"></i>
-              <p >{{player_1}}</p>
-            </div>
-            <div id="{{player_2}}" class="player two">
-              <i class="fa-solid fa-o"></i>
-              <p >{{player_2}}</p>
-            </div>
-          </div>
-        </section>
-      </main>
+{% extends "base.html"%} {% load static %} {%block content%}
+<div class="container">
+  {% for message in messages%} {{message}} {%endfor%}
+  <header>
+    <h1>Tic Tac Toe</h1>
+    <div class="play-again-wrap">
+      <div class="play-again"></div>
+      </div>
+    <div class="nav-btn">
+  <p>Invite Link: <span id="invite" onclick='copyIV()'> {{game.game_uuid}} <span> </p>
+    <p id='click'>Double click on the link to copy</p>
     </div>
-{%endblock content%}
+  </header>
+  <div class="return">
+    <!-- <i class="fa-solid fa-arrow-rotate-left"></i> -->
+    <button id='return-btn'>
+    <a href='#'> <i class="fa-solid fa-arrow-left"></i> </a> </button>
+    <p class='return-hover'>return to home page</p>
+  </div>
+  <main>
+    <section class="section1">
+      <div class="btn-container">
+        {% for i in range%} {% if i in player_1_moves.positions%}
+        <button
+          type="button"
+          class="tic-tac-toe-btn"
+          id="{{i}}"
+          value="{{player_1_moves.player_mark}}"
+        >
+        
+          <h2>{{player_1_moves.player_mark}}</h2>
+        </button>
+        {% elif i in player_2_moves.positions %}
+        <button
+          type="button"
+          class="tic-tac-toe-btn"
+          id="{{i}}"
+          value="{{player_2_moves.player_mark}}"
+        >
+          <h2>{{player_2_moves.player_mark}}</h2>
+        </button>
+        {% else %}
+        <button type="button" class="tic-tac-toe-btn" id="{{i}}"></button>
+        {%endif%} {%endfor%}
+      </div>
+    </section>
+    <section class="section2">
+      <div class="player-container">
+        <div id="{{player_1}}" class="player one">
+          <i class="fa-solid fa-xmark"></i>
+          <div class='scoreboard'>
+            <h3>SCORE</h3>
+            <h1>0</h1>
+          </div>
+          <p>{{player_1}}</p>
+        </div>
+        <div id="{{player_2}}" class="player two">
+          <i class="fa-solid fa-o"></i>
+          <div class='scoreboard'>
+            <h3>SCORE</h3>
+            <h1>0</h1>
+          </div>
+          <p>{{player_2}}</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+{%endblock content%} {%block script%}
+<script defer>
 
-{%block script%}
-<script>
-
-{% if game.versus_type == "BOT"%}
-base_url = `${window.location.host}/bot${window.location.pathname}`
-console.log(base_url)
-{% else %}
-base_url = `${window.location.host}${window.location.pathname}`
-console.log(base_url)
+  {% if game.versus_type == "BOT"%}
+  base_url = `${window.location.host}/bot${window.location.pathname}`
+  console.log(base_url)
+  {% else %}
+  base_url = `${window.location.host}${window.location.pathname}`
+  console.log(base_url)
 
 
-{%endif%}
+  {%endif%}
 
 
 
-const gameSocket = new WebSocket(`ws://${base_url}`)
+  const gameSocket = new WebSocket(`ws://${base_url}`)
 
-function add_event_to_all_buttons(){
-    /*Add event listener that send the event message to all buttons*/
-    const keys = document.querySelectorAll('.tic-tac-toe-btn');
-    keys.forEach(item => {
-      if (item.value == ""){
-        item.addEventListener('click', send_event_message)
+  function add_event_to_all_buttons(){
+      /*Add event listener that send the event message to all buttons*/
+      const keys = document.querySelectorAll('.tic-tac-toe-btn');
+      keys.forEach(item => {
+        if (item.value == ""){
+          item.addEventListener('click', send_event_message)
+      }
     }
-  }
-)}
+  )}
 
-add_event_to_all_buttons()
+  add_event_to_all_buttons()
 
-function send_event_message(event){
-  const { target } = event
-  console.log(target.value)
-  data = {
-    "type":"played",
-    "position":target.id,
-    "player":`{{request.session.user}}`
-    
-  }
-  gameSocket.send(JSON.stringify(data))
+  function send_event_message(event){
+    const { target } = event
+    console.log(target.value)
+    data = {
+      "type":"played",
+      "position":target.id,
+      "player":`{{request.session.user}}`
 
-}
-
-gameSocket.onmessage = function(event){
-  data = JSON.parse(event.data)
-  type = data["type"]
-  console.log(type)
-
-  if (type == "update_board_message"){
-    update_board_handler(data)
-  }
-
-  else if(type == "bot_update_board_message"){
-    
-      bot_update_board_handler(data)
-    
-  }
-  
-  else if (type == "winner_message"){
-    winner_handler(data)
-  }
-  else if (type == "initialize_current_player"){
-    console.log(data)
-    initialize_current_player(data)
-  }
-
-  else if (type == "reload_page"){
-    window.location.reload()
-  }
-
-  
-
-
-
-}
-
-function update_board_handler(data){
-  position=data["position"]
-  player_mark=data["player_mark"]
-  const button = document.getElementById(position)
-  button.value = player_mark
-  button.innerHTML = `<h2>${player_mark}</h2>`
-  button.removeEventListener("click", send_event_message)
-  next_player = data["next_player"]
-  current_player = data["current_player"]
-  document.getElementById(next_player).style.background = "green"
-  document.getElementById(current_player).style.background = "red"
-
-  if (data["count"] >= 10){
-    play_again_handler()
-
-  }
-
-
-
-
-}
-
-function winner_handler(data){
-  let winning_moves = data["winning_moves"]
-  winning_moves.forEach(id=>{
-      let button = document.getElementById(id)
-      button.style.backgroundColor = "green"
-      remove_event_from_all_buttons()
-  })
-  play_again_handler()
-}
-
-function remove_event_from_all_buttons(){
-    /*Add event listener that send the event message to all buttons*/
-    const keys = document.querySelectorAll('.tic-tac-toe-btn');
-    keys.forEach(button => {
-      if (button.value == ""){
-      button.removeEventListener("click", send_event_message)
     }
+    gameSocket.send(JSON.stringify(data))
+
   }
-)}
 
-function initialize_current_player(data){
-  document.location.reload()
+  gameSocket.onmessage = function(event){
+    data = JSON.parse(event.data)
+    type = data["type"]
+    console.log(type)
 
-  current_player = data["current_player"]
-  other_player = data["other_player"]
-  div_class= document.getElementById("None")
-  div_class.setAttribute("id", other_player)
-  player_tag = div_class.getElementByTagName("p")
-  player_tag.innerText(other_player)
-  window.location.reload()
-  
+    if (type == "update_board_message"){
+      update_board_handler(data)
+    }
 
-  document.getElementById(current_player).style.background = "green"
-  document.getElementById(other_player).style.background = "red"
+    else if(type == "bot_update_board_message"){
 
-}
+        bot_update_board_handler(data)
 
-function bot_update_board_handler(data){
-  console.log(data)
-  player_position=data["player_position"]
-  player_mark=data["player_mark"]
-  let button = document.getElementById(player_position)
-  button.value = player_mark
-  button.innerHTML = `<h2>${player_mark}</h2>`
-  button.removeEventListener("click", send_event_message)
-  
-  if (data["bot_position"] != null){
-    bot_position=data["bot_position"]
-    bot_mark=data["bot_mark"]
-    button = document.getElementById(bot_position)
-    button.value = bot_mark
-    button.innerHTML = `<h2>${bot_mark}</h2>`
+    }
+
+    else if (type == "winner_message"){
+      winner_handler(data)
+    }
+    else if (type == "initialize_current_player"){
+      console.log(data)
+      initialize_current_player(data)
+    }
+
+    else if (type == "reload_page"){
+      window.location.reload()
+    }
+
+
+
+
+
+  }
+
+  function update_board_handler(data){
+    position=data["position"]
+    player_mark=data["player_mark"]
+    const button = document.getElementById(position)
+    button.value = player_mark
+    button.innerHTML = `<h2>${player_mark}</h2>`
     button.removeEventListener("click", send_event_message)
+    next_player = data["next_player"]
+    current_player = data["current_player"]
+    document.getElementById(next_player).style.background = "green"
+    document.getElementById(current_player).style.background = "red"
+
+    if (data["count"] >= 10){
+      play_again_handler()
+const navBtn = document.querySelector(".nav-btn")
+        navBtn.style.display = 'none'
     }
-  if (data["count"] >= 10){
+
+
+
+
+  }
+
+  function winner_handler(data){
+    let winning_moves = data["winning_moves"]
+    winning_moves.forEach(id=>{
+        let button = document.getElementById(id)
+        button.style.backgroundColor = "green"
+        remove_event_from_all_buttons()
+    })
     play_again_handler()
+    const navBtn = document.querySelector(".nav-btn")
+        navBtn.style.display = 'none'
+  }
+
+  function remove_event_from_all_buttons(){
+      /*Add event listener that send the event message to all buttons*/
+      const keys = document.querySelectorAll('.tic-tac-toe-btn');
+      keys.forEach(button => {
+        if (button.value == ""){
+        button.removeEventListener("click", send_event_message)
+      }
+    }
+  )}
+
+  function initialize_current_player(data){
+    document.location.reload()
+
+    current_player = data["current_player"]
+    other_player = data["other_player"]
+    div_class= document.getElementById("None")
+    div_class.setAttribute("id", other_player)
+    player_tag = div_class.getElementByTagName("p")
+    player_tag.innerText(other_player)
+    window.location.reload()
+
+
+    document.getElementById(current_player).style.background = "green"
+    document.getElementById(other_player).style.background = "red"
 
   }
-}
 
-function play_again_handler(){
-  let nav_button = document.getElementsByClassName("play-again")
-  play_again_button = document.createElement("button")
-  play_again_button.value = "play again"
-  play_again_button.name = "play_again"
-  play_again_button.type = "submit"
-  play_again_button.innerHTML = "<h4>Play Again</h4>"
-  play_again_button.onclick = function(){
-    gameSocket.send(
-      JSON.stringify({
-        "type":"play_again"
-      })
-    )
+  function bot_update_board_handler(data){
+    console.log(data)
+    player_position=data["player_position"]
+    player_mark=data["player_mark"]
+    let button = document.getElementById(player_position)
+    button.value = player_mark
+    button.innerHTML = `<h2>${player_mark}</h2>`
+    button.removeEventListener("click", send_event_message)
+
+    if (data["bot_position"] != null){
+      bot_position=data["bot_position"]
+      bot_mark=data["bot_mark"]
+      button = document.getElementById(bot_position)
+      button.value = bot_mark
+      button.innerHTML = `<h2>${bot_mark}</h2>`
+      button.removeEventListener("click", send_event_message)
+      }
+    if (data["count"] >= 10){
+      play_again_handler()
+const navBtn = document.querySelector(".nav-btn")
+        navBtn.style.display = 'none'
+    }
   }
-  console.log(play_again_button)
-  document.body.appendChild(play_again_button)
-  console.log(nav_button)
 
-  
-}
+  function play_again_handler(){
+    // const nav_button = document.querySelector(".play-again")
+    // const play_again_wrap = document.querySelector('.play-again-wrap')
+    // play_again_wrap.classList.add('show-wrap')
+    // play_again_button = document.createElement("button")
+    // play_again_button.value = "play again"
+    // play_again_button.name = "play_again"
+    // play_again_button.type = "submit"
+    // play_again_button.innerHTML = "<h4>Play Again</h4>"
+    // play_again_button.onclick = function(){
+    //   gameSocket.send(
+    //     JSON.stringify({
+    //       "type":"play_again"
+    //     })
+    //   )
+    // }
+    // console.log(play_again_button)
+    // nav_button.appendChild(play_again_button)
+    // console.log(nav_button)
+const nav_button = document.querySelector(".play-again")
+    const play_again_wrap = document.querySelector('.play-again-wrap')
+    play_again_wrap.classList.add('show-wrap')
+    let element = document.createElement("div")
+    element.style.display= 'flex'
+    element.style.flexDirection= 'column'
+    element.style.alignItems= 'center'
+    element.style.gap= '100px'
+    element.innerHTML = `<button id='play_again_button' value='play again' name='play_again' type='submit'><h4>Play Again</h4></button>
+      <button class='sidebar-return-btn'> <a href="#">return to home page</a> </button>`
+      nav_button.appendChild(element)
 
+      const play_again_button = document.getElementById('play_again_button')
+      console.log(play_again_button);
+   play_again_button.addEventListener('click', function(){
+      gameSocket.send(
+        JSON.stringify({
+          "type":"play_again"
+        })
+      )
+    })
+    const navBtn = document.querySelector(".nav-btn")
+        navBtn.style.display = 'none'
+  }
+  function copyIV() {
+    const invite = document.getElementById('invite');
+    const click = document.getElementById('click')
+    invite?.addEventListener('click', (e) => {
+      navigator.clipboard.writeText(e.target.textContent);
+      click.textContent = 'The link has been copied to your clipboard!!!'
+      click.style.fontStyle = 'italic'
+      const mytimeout = setTimeout(function(){
+        const navBtn = document.querySelector(".nav-btn")
+        navBtn.style.display = 'none'
+      },5000)
+    });
+  }
+ const returnBtn = document.getElementById('return-btn');
+  const returnHover = document.querySelector('.return-hover');
+  console.log(returnBtn);
+  console.log(returnHover);
+  returnBtn.addEventListener('mouseover', () => {
+    returnHover.classList.add('show-hover');
+  });
+  returnBtn.addEventListener('mouseout', () => {
+    returnHover.classList.remove('show-hover');
+  });
 
 </script>
+<script src="{% static 'js/app.js' %}" defer></script>
+
 {%endblock script%}

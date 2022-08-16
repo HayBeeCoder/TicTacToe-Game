@@ -11,15 +11,55 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
     />
+<script defer src="{% static 'js/app.js' %}"></script>
   </head>
   <body>
+    <nav>
+      <div class="nav-body">
+        <div class="nav-header">
+        <div class="logo">
+          LOGO
+        </div>
+        <button class="nav-toggle" id="toggle-btn"><i class="fa-solid fa-bars"></i></button>
+        </div>
+        <div class="lists-container" id="list">
+          <div class="lists">
+          <h3><a href="#">Home</a></h3>
+          <h3><a href="#">My Github</a></h3>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <aside class="sidebar-wrapper">
+      <div class="sidebar">
+        <button class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+        <div class="sidebar-texts">
+          <h2>INSTRUCTIONS</h2>
+          <div class="multiplayer">
+          <h3>To play multiplayer with your friend</h3>
+          <ul>
+            <li>Create a VS game</li>
+            <li>Click on the invite link at the top to copy on your clipboard</li>
+            <li>Send the link to your friend</li>
+            <li>Your friend should input the link on the input provided in the homepage</li>
+          </ul>
+</div>
+<div class="play-with-bot">
+  <h3>To play with bot</h3>
+  <ul>
+    <li>Click on the Bot button in the homepage</li>
+  </ul>
+</div>        
+        </div>
+      </div>
+    </aside>
     <main>
       <header>
         <h1>Tic Tac Toe</h1>
        
       </header>
       <div class="btn-container">
-        <button id="createNewGame">Create a new game</button>
+        <h2>CREATE A NEW GAME</h2>
 
         <form method="post" action="/">
           <div class="nav-btn">
@@ -31,9 +71,7 @@
                 <i class="fa-solid fa-robot"></i>
                 <span> BOT </span>
               </button>
-            
             </div>
-      
           <div class="OR">
           <i class="fa-solid fa-o"></i>
           <i class="fa-solid fa-r"></i>
@@ -47,6 +85,7 @@
           <button id="submit">Submit</button>
         </form>
         </div>
+        <p class="info">Click for instructions</p>
       </div>
     </main>
   </body>
