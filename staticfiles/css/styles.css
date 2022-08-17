@@ -1,0 +1,233 @@
+:root {
+  --brown: #42032c;
+  --orange: #d36b00;
+  --pink: #e6d2aa;
+  --white: #e6d2aa;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+body {
+  min-height: 100vh;
+  display: flex;
+  background: var(--brown);
+  color: var(--white);
+  padding-bottom: 25px;
+}
+.container {
+  margin: auto;
+  height: 85vh;
+  width: 900px;
+}
+header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  height: 15vh;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.nav-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+.nav-btn button {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100px;
+  height: 40px;
+  border-radius: 5px;
+  border-color: white;
+}
+
+main {
+  width: 450px;
+  margin: auto;
+}
+.section1 {
+  background: var(--orange);
+  height: 60vh;
+  border-radius: 5px;
+}
+.btn-container {
+  padding-top: 30px;
+  padding-left: 20px;
+  padding-right: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  height: 55vh;
+  align-content: center;
+  place-items: center;
+  flex-shrink: 1;
+}
+.tic-tac-toe-btn {
+  width: 100px;
+  height: 100px;
+  border-radius: 5px;
+  border-color: var(--brown);
+  background-color: var(--brown);
+  color: var(--pink);
+}
+.section2 {
+  margin-top: 15px;
+  height: 13vh;
+}
+.player-container {
+  display: flex;
+  flex-direction: row;
+}
+.player {
+  height: 13vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px;
+  align-items: center;
+  width: 50%;
+  background: var(--orange);
+  border-radius: 5px;
+}
+.one {
+  margin-right: 2px;
+}
+.two {
+  margin-left: 2px;
+}
+button:hover {
+  background: var(--pink);
+  border-color: var(--brown);
+  cursor: pointer;
+  color: var(--orange);
+}
+.return {
+  position: fixed;
+  top: 0;
+  right: 0;
+  font-style: italic;
+  padding: 10px;
+  cursor: pointer;
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.return-hover {
+  display: none;
+}
+.show-hover {
+  display: block;
+}
+.return button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border-color: var(--orange);
+}
+.return a {
+  color: var(--orange);
+  font-size: 25px;
+}
+.return a:hover {
+  color: var(--brown);
+}
+.return {
+  font-size: 15px;
+}
+.play-again {
+  width: 60vw;
+  height: 60vh;
+  max-width: 620px;
+  background: var(--white);
+  border-radius: 0.25rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  position: relative;
+  padding: 4rem 2rem;
+}
+.play-again button {
+  border: 2px solid var(--orange);
+  background: transparent;
+  color: var(--brown);
+  border-radius: 5px;
+}
+.play-again button:hover {
+  border-color: var(--brown);
+  background: var(--orange);
+  color: var(--white);
+}
+.play-again h4 {
+  padding: 5px;
+  font-size: 25px;
+}
+.play-again-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  visibility: hidden;
+  z-index: -1;
+  transition: all 0.3s linear;
+  transform: scale(0);
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.show-wrap {
+  visibility: visible;
+  z-index: 2;
+  transform: scale(1);
+}
+#invite {
+  cursor: pointer;
+}
+.play-again {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+.sidebar-return-btn {
+  height: 40px;
+  width: 200px;
+}
+.sidebar-return-btn a {
+  color: var(--brown);
+  text-decoration: none;
+  font-size: 20px;
+  font-style: italic;
+}
+.scoreboard {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.scoreboard h1 {
+  height: 40px;
+  width: 50px;
+  background: var(--brown);
+  border-radius: 5px;
+  display: grid;
+  place-content: center;
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: 450px;
+  }
+  main {
+    width: 380px;
+  }
+}
