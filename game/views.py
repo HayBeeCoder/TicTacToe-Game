@@ -21,27 +21,28 @@ def game_view(request, uuid):
 
     game = Game.objects.get(game_uuid=uuid)
     moves = game.moves.all()
-    player_1 = game.player_1
-    player_2 = game.player_2
+    player_1 = game.player_1.get_decoded()["user"]
+    player_2 = game.player_2.get_decoded()["user"] if game.player_2 else None
     players = game.players.all()
     context={
         "game":game,
         "moves":moves,
-        "player_1":player_1.get_decoded()["user"],
-        "player_2":player_2.get_decoded()["user"] if player_2 else player_2,
+        "player_1":player_1,
+        "player_2":player_2,
         "range": [str(i) for i in range(1,10)],
-        "player_1_moves":moves.get(player=player_1),
-        "player_2_moves":moves.get(player=player_2) if len(moves) > 1 else "",
-        "player_1_scores":game.scores.get(str(player_1)),
-        "player_2_scores":0 if not game.scores.get(str(player_2)) else game.scores.get(str(player_2))
+        "player_1_moves":moves.get(player=game.player_1),
+        "player_2_moves":moves.get(player=game.player_2) if len(moves) > 1 else "",
+        #TODO Fix player 1
+        "player_1_score":0 if not game.scores.get(player_1) else game.scores.get(player_1),
+        "player_2_score":0 if not game.scores.get(str(player_2)) else game.scores.get(str(player_2))
 
         
     }
+    print(game.scores, player_1, players)
     return render(request, "game.html", context=context)
 
 @csrf_exempt
 def index(request:HttpRequest):
-    request.session["user"] = f"player_{random.randint(0,100)}"
     if request.method == "POST":
         request.session["user"] = f"player_{random.randint(0,100)}"
         session_obj = Session.objects.get(session_key=request.session.session_key)
@@ -64,8 +65,6 @@ def index(request:HttpRequest):
             return redirect(new_game)
         elif request.POST.get("new-game-bot"):
             BOT = Session.objects.get(session_key=settings.BOT_KEY)
-            request.session["user"] = f"player_{random.randint(0,100)}"
-            session_obj = Session.objects.get(session_key=request.session.session_key)
             new_game = Game.objects.create(game_uuid =uuid4() ,
                                         status = "In_Progress",
                                          created_by=session_obj,

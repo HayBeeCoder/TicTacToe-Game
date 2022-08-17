@@ -76,9 +76,13 @@ class Game(models.Model):
     def add_new_player(self, player, mark="O"):
         if self.players.all().count() < 2:
             self.players.add(player)
+            print(player.get_decoded()["user"], "In ta")
             Move.objects.create(game=self, player=player, positions=[], player_mark = mark)
-            self.scores.update({player.get_decoded()["user"], 0})
+            
+            self.scores.setdefault(player.get_decoded()["user"],0)
+            #print(self.scores)
             self.save()
+            print(self.player_1.get_decoded())
 
         else:
             raise Exception("A Game cannot have more than two players")
@@ -90,7 +94,7 @@ class Game(models.Model):
             if moves == set(wining_move):
                 self.winner = self.current_player
                 self.status = "Finished"
-                scores_count = self.scores.set_default(self.current_player, 0)
+                scores_count = self.scores.setdefault(self.current_player.get_decoded()["user"], 0)
                 self.scores.update({self.current_player.get_decoded()["user"]:scores_count+1})
                 self.save()
                 return True, moves

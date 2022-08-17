@@ -7,7 +7,7 @@
       <div class="play-again"></div>
       </div>
     <div class="nav-btn">
-  <p>Invite Link: <span id="invite" onclick='copyIV()'> {{game.game_uuid}} <span> </p>
+  <p>Invite Link: <span id="invite" onclick='copyIV()'>{{game.game_uuid}}<span></p>
     <p id='click'>Double click on the link to copy</p>
     </div>
   </header>
@@ -50,7 +50,7 @@
           <i class="fa-solid fa-xmark"></i>
           <div class='scoreboard'>
             <h3>SCORE</h3>
-            <h1>0</h1>
+            <h1>{{player_1_score}}</h1>
           </div>
           <p>{{player_1}}</p>
         </div>
@@ -58,7 +58,7 @@
           <i class="fa-solid fa-o"></i>
           <div class='scoreboard'>
             <h3>SCORE</h3>
-            <h1>0</h1>
+            <h1>{{player_2_score}}</h1>
           </div>
           <p>{{player_2}}</p>
         </div>
