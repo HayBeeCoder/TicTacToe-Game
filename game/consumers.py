@@ -17,6 +17,7 @@ class TicTacToeConsumer(WebsocketConsumer):
         self.game = Game.objects.get(game_uuid = self.game_uuid)
         #self.user = self.scope["user"]
         async_to_sync(self.channel_layer.group_add)(self.game_uuid, self.channel_name)
+        print(self.channel_name)
         self.players =  self.game.players.all()
         self.accept()
         
@@ -91,6 +92,7 @@ class TicTacToeConsumer(WebsocketConsumer):
             {
                 "type":event.get("type"),
                 "winner":event.get("user"),
+                "scores":self.game.scores,
                 "position":event.get("position"),
                 "winning_moves":event.get("winning_moves")
             }

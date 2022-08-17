@@ -31,7 +31,10 @@ def game_view(request, uuid):
         "player_2":player_2.get_decoded()["user"] if player_2 else player_2,
         "range": [str(i) for i in range(1,10)],
         "player_1_moves":moves.get(player=player_1),
-        "player_2_moves":moves.get(player=player_2) if len(moves) > 1 else ""
+        "player_2_moves":moves.get(player=player_2) if len(moves) > 1 else "",
+        "player_1_scores":game.scores.get(str(player_1)),
+        "player_2_scores":0 if not game.scores.get(str(player_2)) else game.scores.get(str(player_2))
+
         
     }
     return render(request, "game.html", context=context)
