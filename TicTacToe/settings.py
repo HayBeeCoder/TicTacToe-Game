@@ -78,7 +78,7 @@ ASGI_APPLICATION = "TicTacToe.asgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-'''
+
 if DEBUG:
     DATABASES = {
             'default': {
@@ -90,7 +90,7 @@ if DEBUG:
                 'PORT': config('DATABASE_PORT'),
             }
         }
-'''
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
