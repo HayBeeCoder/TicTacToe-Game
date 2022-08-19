@@ -7,8 +7,8 @@
       <div class="play-again"></div>
       </div>
     <div class="nav-btn">
-  <p>Invite Link: <span id="invite" onclick='copyIV()'>{{game.game_uuid}}<span></p>
-    <p id='click'>Double click on the link to copy</p>
+  <p>Invite Link: <span id='invite' >{{game.game_uuid}}<span></p>
+  <button type='button' onclick='copyIV()' id='click' > Copy link</button>
     </div>
   </header>
   <div class="return">
@@ -228,24 +228,6 @@ const navBtn = document.querySelector(".nav-btn")
   }
 
   function play_again_handler(){
-    // const nav_button = document.querySelector(".play-again")
-    // const play_again_wrap = document.querySelector('.play-again-wrap')
-    // play_again_wrap.classList.add('show-wrap')
-    // play_again_button = document.createElement("button")
-    // play_again_button.value = "play again"
-    // play_again_button.name = "play_again"
-    // play_again_button.type = "submit"
-    // play_again_button.innerHTML = "<h4>Play Again</h4>"
-    // play_again_button.onclick = function(){
-    //   gameSocket.send(
-    //     JSON.stringify({
-    //       "type":"play_again"
-    //     })
-    //   )
-    // }
-    // console.log(play_again_button)
-    // nav_button.appendChild(play_again_button)
-    // console.log(nav_button)
 const nav_button = document.querySelector(".play-again")
     const play_again_wrap = document.querySelector('.play-again-wrap')
     play_again_wrap.classList.add('show-wrap')
@@ -270,19 +252,19 @@ const nav_button = document.querySelector(".play-again")
     const navBtn = document.querySelector(".nav-btn")
         navBtn.style.display = 'none'
   }
-  function copyIV() {
+
+ function copyIV() {
     const invite = document.getElementById('invite');
-    const click = document.getElementById('click')
-    invite?.addEventListener('click', (e) => {
-      navigator.clipboard.writeText(e.target.textContent);
-      click.textContent = 'The link has been copied to your clipboard!!!'
-      click.style.fontStyle = 'italic'
+    const click = document.getElementById('click');
+      navigator.clipboard.writeText(invite.textContent);
+      click.textContent = 'Link copied!!'
+      click.style.fontStyle = 'italic' 
       const mytimeout = setTimeout(function(){
         const navBtn = document.querySelector(".nav-btn")
         navBtn.style.display = 'none'
-      },5000)
-    });
-  }
+      },3000)
+  } 
+
  const returnBtn = document.getElementById('return-btn');
   const returnHover = document.querySelector('.return-hover');
   console.log(returnBtn);

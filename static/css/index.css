@@ -31,7 +31,6 @@ main {
   width: 400px;
   padding: 20px;
   border-radius: 5px;
-  /* flex-grow: 1; */
 }
 button {
   width: 200px;
@@ -111,9 +110,6 @@ nav {
   border-color: var(--pink);
   background-color: var(--brown);
   width: 70px;
-}
-.nav-toggle:hover {
-  transform: rotate(90deg);
 }
 .lists-container {
   height: 0px;
