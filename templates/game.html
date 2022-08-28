@@ -260,6 +260,10 @@ const nav_button = document.querySelector(".play-again")
 //    ==================== ending ============================
    
  async function copyIV() {
+    if (!navigator?.clipboard) {
+      console.warn('Clipboard not supported')
+      return false
+    }
    alert('inside the copyIV function')
     const invite = document.getElementById('invite');
     const click = document.getElementById('click');
