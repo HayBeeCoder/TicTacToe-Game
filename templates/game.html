@@ -260,6 +260,7 @@ const nav_button = document.querySelector(".play-again")
 //    ==================== ending ============================
    
  async function copyIV() {
+   alert('inside the copyIV function')
     const invite = document.getElementById('invite');
     const click = document.getElementById('click');
     await navigator.clipboard.writeText(invite.textContent)
