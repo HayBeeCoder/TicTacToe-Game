@@ -253,16 +253,12 @@ const nav_button = document.querySelector(".play-again")
         navBtn.style.display = 'none'
   }
 
-//    ================================ add this =================
-   const clickButton = document.querySelectorById('click')
-   clickButton.addEventListener('click' , () => copyIV())
+
    
-//    ==================== ending ============================
-   
- function copyIV() {
+async function copyIV() {
     const invite = document.getElementById('invite');
     const click = document.getElementById('click');
-      navigator.clipboard.writeText(invite.textContent);
+     await navigator.clipboard.writeText(invite.textContent);
       click.textContent = 'Link copied!!'
       click.style.fontStyle = 'italic' 
       const mytimeout = setTimeout(function(){
