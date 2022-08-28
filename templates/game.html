@@ -253,32 +253,26 @@ const nav_button = document.querySelector(".play-again")
         navBtn.style.display = 'none'
   }
 
-//    ================================ add this =================
-//    const clickButton = document.querySelectorById('click')
-//    clickButton.addEventListener('click' , () => copyIV())
    
-//    ==================== ending ============================
-   
- async function copyIV() {
-    if (!navigator?.clipboard) {
-      alert('Clipboard not supported')
-      return false
-    }
-   alert('inside the copyIV function')
+//    ================ for browsers that do not support clipboard api ===============
+   function copy(element) {
+  element.select();
+  document.execCommand("copy");
+}
+
+ function copyIV() {
     const invite = document.getElementById('invite');
     const click = document.getElementById('click');
-    await navigator.clipboard.writeText(invite.textContent)
-          .then(
-    ()  =>  alert("copied successfully")        
-    ).catch(() => { alert("something went wrong") })
-   
-   ;
-//       click.textContent = 'Link copied!!'
-//       click.style.fontStyle = 'italic' 
-//       const mytimeout = setTimeout(function(){
-//         const navBtn = document.querySelector(".nav-btn")
-//         navBtn.style.display = 'none'
-//       },3000)
+  if(!navigator?.clipboard){
+    copy(invite)
+  }
+    navigator.clipboard.writeText(invite.textContent)
+    click.textContent = 'Link copied!!'
+    click.style.fontStyle = 'italic' 
+    const mytimeout = setTimeout(function(){
+    const navBtn = document.querySelector(".nav-btn")
+    navBtn.style.display = 'none'
+     },3000)
   } 
 
  const returnBtn = document.getElementById('return-btn');
